@@ -7,100 +7,141 @@
 
 <style>
 :root {
-  --bg: #0e0e0e;
-  --box: #111;
-  --text: #f2f2f2;
-  --muted: #777;
+  --bg:#0e0e0e;
+  --box:#111;
+  --text:#f2f2f2;
+  --muted:#777;
 }
 
-* { box-sizing: border-box; }
+*{box-sizing:border-box}
 
-body {
-  margin: 0;
-  height: 100vh;
-  background: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: var(--text);
+body{
+  margin:0;
+  height:100vh;
+  background:var(--bg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:system-ui,Segoe UI,sans-serif;
+  color:var(--text);
 }
 
-.container {
-  width: 100%;
-  height: 100%;
-  padding: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.container{
+  width:100%;
+  height:100%;
+  padding:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
 }
 
-.box {
-  width: 100%;
-  max-width: 720px;
-  background: var(--box);
-  padding: 48px;
-  border-radius: 18px;
-  font-size: 42px;
-  line-height: 1.4;
-  max-width: 20ch;
-  min-height: 45vh;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+.box{
+  width:100%;
+  max-width:720px;
+  background:var(--box);
+  padding:48px;
+  border-radius:18px;
+  font-size:44px;
+  line-height:1.4;
+  max-width:20ch;
+  min-height:45vh;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+  overflow:hidden;
 }
 
-.box:focus { outline: none; }
+.blur-top{
+  filter:blur(8px);
+  transition:filter 3.6s cubic-bezier(.2,.9,.2,1);
+}
+.blur-top.clear{filter:blur(0)}
 
-.cursor {
-  display: inline-block;
-  width: 2px;
-  height: 1em;
-  background: var(--text);
-  margin-left: 4px;
-  animation: blink 1.2s infinite;
+.box-inner{
+  animation:microMove 12s linear infinite;
+  transform-origin:center;
 }
 
-@keyframes blink {
-  0%,50% { opacity: 1; }
-  51%,100% { opacity: 0; }
+@keyframes microMove{
+  0%{transform:scale(1) translateY(10px)}
+  50%{transform:scale(1.012) translateY(-8px)}
+  100%{transform:scale(1.025) translateY(10px)}
 }
 
-.controls {
-  position: fixed;
-  bottom: 14px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+.cursor{
+  display:inline-block;
+  width:2px;
+  height:1em;
+  background:var(--text);
+  margin-left:4px;
+  animation:blink 1.4s infinite;
 }
 
-button {
-  background: transparent;
-  border: 1px solid var(--muted);
-  color: var(--text);
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-size: 13px;
-  cursor: pointer;
+@keyframes blink{
+  0%,50%{opacity:1}
+  51%,100%{opacity:0}
 }
 
-button:hover { opacity: 0.85; }
-
-.hold {
-  animation: breathe 2.5s ease-in-out infinite;
+.burst{
+  display:block;
+  font-size:1.25em;
+  font-weight:800;
+  margin:14px 0;
 }
 
-@keyframes breathe {
-  0% { opacity: 0.96; }
-  50% { opacity: 1; }
-  100% { opacity: 0.96; }
+.hold{
+  animation:breathe 2.8s ease-in-out infinite;
+}
+
+@keyframes breathe{
+  0%{opacity:.96}
+  50%{opacity:1}
+  100%{opacity:.96}
+}
+
+.controls{
+  position:fixed;
+  bottom:14px;
+  display:flex;
+  gap:10px;
+}
+
+button{
+  background:transparent;
+  border:1px solid var(--muted);
+  color:var(--text);
+  padding:8px 12px;
+  border-radius:10px;
+  font-size:13px;
+  cursor:pointer;
+}
+
+button:hover{opacity:.85}
+
+/* grain */
+.grain{
+  pointer-events:none;
+  position:fixed;
+  inset:0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,.03),
+      rgba(255,255,255,.03) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+  opacity:.06;
 }
 </style>
 </head>
 
 <body>
-
 <div class="container">
-  <div id="box" class="box" contenteditable="false" spellcheck="false">
-    Ready<span class="cursor"></span>
+
+  <div id="box" class="box blur-top">
+    <div id="inner" class="box-inner">
+      <span class="cursor"></span>
+    </div>
   </div>
 
   <div class="controls">
@@ -108,58 +149,96 @@ button:hover { opacity: 0.85; }
     <button onclick="insertQuestion()">Question ↓</button>
     <button onclick="fullscreen()">Fullscreen</button>
   </div>
+
 </div>
 
+<div class="grain"></div>
+
 <script>
-const box = document.getElementById("box");
-const cursor = document.querySelector(".cursor");
+const box=document.getElementById("box");
+const inner=document.getElementById("inner");
+const cursor=document.querySelector(".cursor");
 
-const TYPE_SPEED = 160;   // readable for Reels
-const LINE_PAUSE = 900;  // hesitation pause
+/* SAFE SPEEDS */
+const START_DELAY=1200;
+const TYPE_SPEED=170;
+const LINE_PAUSE=900;
+const BLOCK_PAUSE=2000;
 
-function fullscreen() {
-  if (!document.fullscreenElement) {
+function fullscreen(){
+  if(!document.fullscreenElement){
     document.documentElement.requestFullscreen();
-  } else {
+  }else{
     document.exitFullscreen();
   }
 }
 
-function insertQuestion() {
-  cursor.insertAdjacentText("beforebegin", "\n\n↓\n");
+function insertQuestion(){
+  cursor.insertAdjacentText("beforebegin","\n\n↓\n");
 }
 
-function autoType() {
-  const text = prompt("Paste text (use blank lines for pauses):");
-  if (!text) return;
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
-  box.classList.remove("hold");
-  box.innerHTML = "";
-  box.appendChild(cursor);
+async function burstWord(word){
+  const span=document.createElement("span");
+  span.textContent=word;
+  span.className="burst";
+  span.style.opacity="0";
+  inner.insertBefore(span,cursor);
+  requestAnimationFrame(()=>{
+    span.style.transition="opacity .08s";
+    span.style.opacity="1";
+  });
+  await sleep(1200);
+}
 
-  let i = 0;
+async function autoType(){
+  const text=prompt("Paste text (blank line = long pause):");
+  if(!text)return;
 
-  function typeChar() {
-    if (i >= text.length) {
-      cursor.remove();
-      box.classList.add("hold"); // end-frame hold
-      return;
+  inner.innerHTML="";
+  inner.appendChild(cursor);
+  box.classList.remove("clear","hold");
+
+  await sleep(START_DELAY);
+
+  let cleared=false;
+
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+
+    if(ch==="*"){           // *WORD* → burst
+      let word="";
+      i++;
+      while(i<text.length && text[i]!=="*"){
+        word+=text[i];
+        i++;
+      }
+      await burstWord(word.toUpperCase());
+      continue;
     }
 
-    const char = text[i];
-    cursor.insertAdjacentText("beforebegin", char);
-    i++;
+    cursor.insertAdjacentText("beforebegin",ch);
 
-    if (char === "\n") {
-      setTimeout(typeChar, LINE_PAUSE);
-    } else {
-      setTimeout(typeChar, TYPE_SPEED);
+    if(!cleared && ch==="\n"){
+      box.classList.add("clear");
+      cleared=true;
+    }
+
+    if(ch==="\n"){
+      if(text[i+1]==="\n"){
+        await sleep(BLOCK_PAUSE);
+      }else{
+        await sleep(LINE_PAUSE);
+      }
+    }else{
+      await sleep(TYPE_SPEED);
     }
   }
 
-  typeChar();
+  cursor.remove();
+  box.classList.add("hold");
 }
 </script>
-
 </body>
 </html>
