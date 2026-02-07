@@ -3,113 +3,150 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Neural Type</title>
+<title>Neural Type Studio</title>
 <style>
 :root {
-  --bg: #000;
-  --text: #e2e8f0;
-  --accent: #3b82f6;
-  --glow: rgba(59,130,246,0.3);
-  --grain: #111;
+  --bg: #0a0a0e;
+  --glass: rgba(20,20,32,0.6);
+  --text: #f0f4ff;
+  --gold: #d4af37;
+  --glow: rgba(212,175,55,0.4);
+  --soft-blue: #1e3a8a;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
-  height:100vh; background:radial-gradient(circle at 20% 80%,#1e1b4b 0%,#000 50%);
-  font-family:'Inter',-apple-system,sans-serif;
-  overflow:hidden;
-  position:relative;
+  height:100vh; background:linear-gradient(135deg,#0a0a0e 0%,#1a1a2e 50%,#16213e 100%);
+  font-family:'SF Mono',Monaco,'Cascadia Code',monospace;
+  overflow:hidden; position:relative;
 }
 body::before {
-  content:''; position:fixed; top:0;left:0;right:0;bottom:0;
-  background:radial-gradient(circle,transparent 20%,var(--grain) 100%);
-  opacity:0.1; pointer-events:none; animation:grain 0.2s infinite;
+  content:''; position:fixed; inset:0;
+  background:radial-gradient(circle at 30% 20%,rgba(212,175,55,0.08) 0%,transparent 50%),
+              radial-gradient(circle at 80% 80%,rgba(30,58,138,0.06) 0%,transparent 50%);
+  animation:breathe 8s ease-in-out infinite;
 }
-@keyframes grain { 0%,100%{transform:translate(0,0)} 10%{transform:translate(-1px,1px)} 20%{transform:translate(-2px,0)} 30%{transform:translate(1px,-1px)} }
-.container { 
-  height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem; 
-  perspective:1000px; position:relative;
+@keyframes breathe { 0%,100%{opacity:0.7} 50%{opacity:1} }
+.container {
+  height:100vh; display:flex; align-items:center; justify-content:center; padding:3rem;
 }
-.type-box {
-  width:100%; max-width:28ch; background:rgba(15,15,23,0.8);
-  backdrop-filter:blur(20px); border:1px solid rgba(59,130,246,0.2);
-  border-radius:24px; padding:3rem 2rem; font-size:clamp(42px,5vw,52px);
-  line-height:1.2; color:var(--text); box-shadow:0 25px 50px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.1);
-  position:relative; transform-style:preserve-3d; transition:transform 0.3s ease;
+.type-studio {
+  width:100%; max-width:24ch; background:var(--glass);
+  backdrop-filter:blur(30px); border:1px solid rgba(212,175,55,0.3);
+  border-radius:32px; padding:4rem 2.5rem; font-size:clamp(48px,6vw,60px);
+  line-height:1.3; color:var(--text); box-shadow:
+    0 40px 80px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.15),
+    0 0 60px rgba(212,175,55,0.1);
+  position:relative; transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
 }
-.type-box:focus { outline:none; box-shadow:0 35px 70px rgba(59,130,246,0.2),0 0 0 1px var(--accent); transform:translateY(-5px) rotateX(2deg); }
-.type-box::before {
-  content:''; position:absolute; top:-2px; left:-2px; right:-2px; bottom:-2px;
-  background:linear-gradient(45deg,var(--accent),#8b5cf6,#ec4899); border-radius:26px;
-  z-index:-1; opacity:0; transition:opacity 0.3s; filter:blur(8px);
+.type-studio:focus {
+  outline:none; 
+  box-shadow:
+    0 50px 100px rgba(0,0,0,0.8),
+    0 0 0 1px var(--gold),
+    0 0 80px var(--glow);
+  transform:translateY(-8px) scale(1.02);
 }
-.type-box:focus::before { opacity:1; }
+.type-studio::before {
+  content:''; position:absolute; inset:-4px; border-radius:36px;
+  background:linear-gradient(45deg,var(--gold),#f4d03f,#d4af37); 
+  z-index:-1; opacity:0; filter:blur(12px); transition:opacity 0.4s;
+}
+.type-studio:focus::before { opacity:1; }
 .cursor {
-  display:inline-block; width:3px; height:1.1em; background:linear-gradient(to bottom,var(--accent),#60a5fa);
-  margin-left:2px; vertical-align:bottom; animation:blink 0.8s infinite,shine 2s infinite;
-  box-shadow:0 0 10px var(--glow);
+  display:inline-block; width:4px; height:1.2em; 
+  background:linear-gradient(to bottom,var(--gold),#f4d03f);
+  margin-left:3px; vertical-align:bottom;
+  animation:luxuryBlink 1.2s infinite, pulseGlow 3s infinite;
+  box-shadow:0 0 15px var(--glow);
 }
-@keyframes blink { 0%,45%{opacity:1} 50%,100%{opacity:0} }
-@keyframes shine { 0%,100%{box-shadow:0 0 10px var(--glow)} 50%{box-shadow:0 0 20px var(--accent)} }
+@keyframes luxuryBlink { 
+  0%,40%{opacity:1; transform:scaleY(1)} 
+  45%,55%{opacity:0; transform:scaleY(0.3)} 
+  100%{opacity:1; transform:scaleY(1)} 
+}
+@keyframes pulseGlow {
+  0%,100%{box-shadow:0 0 15px var(--glow)}
+  50%{box-shadow:0 0 30px var(--gold)}
+}
+.status-bar {
+  position:fixed; top:2rem; left:50%; transform:translateX(-50%);
+  background:var(--glass); backdrop-filter:blur(20px);
+  padding:0.75rem 2rem; border-radius:24px; border:1px solid rgba(212,175,55,0.2);
+  font-size:14px; color:#a8b4ff; letter-spacing:0.5px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.3);
+}
 .controls {
-  position:fixed; bottom:2rem; left:50%; transform:translateX(-50%);
-  display:flex; gap:1rem; background:rgba(0,0,0,0.7); backdrop-filter:blur(12px);
-  padding:1rem 2rem; border-radius:50px; border:1px solid rgba(255,255,255,0.1);
+  position:fixed; bottom:2.5rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:1rem; background:var(--glass); backdrop-filter:blur(25px);
+  padding:1.25rem 2.5rem; border-radius:50px; border:1px solid rgba(212,175,55,0.2);
+  box-shadow:0 30px 60px rgba(0,0,0,0.4);
 }
 button {
-  background:linear-gradient(135deg,#1e293b,#334155); color:#e2e8f0; border:none;
-  padding:0.75rem 1.5rem; border-radius:50px; font-weight:500; cursor:pointer;
-  font-size:14px; transition:all 0.2s; position:relative; overflow:hidden;
+  background:linear-gradient(145deg,#1a1a2e,#0f0f1a); 
+  color:var(--text); border:1px solid rgba(212,175,55,0.3);
+  padding:1rem 1.75rem; border-radius:25px; font-family:inherit;
+  font-size:15px; font-weight:500; cursor:pointer; position:relative;
+  transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94); overflow:hidden;
 }
 button::before {
-  content:''; position:absolute; top:0;left:-100%; width:100%; height:100%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent); transition:left 0.5s;
+  content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(212,175,55,0.2),transparent);
+  transform:translateX(-100%); transition:transform 0.6s;
 }
-button:hover::before { left:100%; }
-button:hover { transform:translateY(-2px); box-shadow:0 10px 25px rgba(0,0,0,0.3); }
+button:hover::before { transform:translateX(100%); }
+button:hover { 
+  transform:translateY(-3px) scale(1.05); 
+  box-shadow:0 20px 40px rgba(212,175,55,0.3);
+  border-color:var(--gold);
+}
 .paste-area { display:none; }
-.title {
-  position:fixed; top:2rem; left:50%; transform:translateX(-50%);
-  background:linear-gradient(135deg,#3b82f6,#8b5cf6); -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent; background-clip:text;
-  font-size:clamp(1.2rem,2vw,1.8rem); font-weight:800; letter-spacing:-0.02em; text-align:center;
-}
 </style>
 </head>
 <body>
-<div class="title">Neural Type • Attention Engineering</div>
+<div class="status-bar">Neural Type Studio • Optimized for 18s+ AVD</div>
 <div class="container">
-  <div id="box" class="type-box" contenteditable="true" spellcheck="false">
-    Algorithm pause<br><span class="cursor"></span>
+  <div id="box" class="type-studio" contenteditable="true" spellcheck="false">
+    Perfect<br>hesitation<span class="cursor"></span>
   </div>
   <textarea class="paste-area" id="pasteArea"></textarea>
 </div>
 <div class="controls">
-  <button onclick="toggleTheme()">Pulse</button>
-  <button onclick="startNeuralType()">Neural Type</button>
-  <button onclick="launch()">Immersive</button>
-  <button onclick="slowPulse()">−</button>
-  <button onclick="fastPulse()">+</button>
+  <button onclick="toggleLuxury()">Luxury</button>
+  <button onclick="startPerfectType()">Perfect Type</button>
+  <button onclick="immersiveMode()">Studio</button>
+  <button onclick="slowerPulse()">Slower</button>
+  <button onclick="fasterPulse()">Faster</button>
 </div>
 
 <script>
-const box=document.getElementById('box'),cursor=document.querySelector('.cursor'),pasteArea=document.getElementById('pasteArea');
-let pulseSpeed=0.8; document.documentElement.style.setProperty('--pulse-speed',pulseSpeed+'s');
+const box=document.getElementById('box'), cursor=document.querySelector('.cursor');
+let typeSpeed=220; // SLOW & LUXURIOUS - perfect for Reels
 
 box.addEventListener('input',()=>box.appendChild(cursor));
 
-function toggleTheme(){document.body.classList.toggle('pulse');}
-function launch(){document.documentElement.requestFullscreen();}
-function slowPulse(){pulseSpeed+=0.2; document.documentElement.style.setProperty('--pulse-speed',pulseSpeed+'s');}
-function fastPulse(){pulseSpeed=Math.max(0.4,pulseSpeed-0.2); document.documentElement.style.setProperty('--pulse-speed',pulseSpeed+'s');}
+function toggleLuxury() {
+  document.body.style.background='linear-gradient(135deg,#f5f5f0 0%,#e8e8e0 50%,#d4d4c8 100%)';
+  document.documentElement.style.setProperty('--text','#1a1a2e');
+}
+function immersiveMode() { document.documentElement.requestFullscreen(); }
+function slowerPulse() { typeSpeed=Math.min(320,typeSpeed+30); updateSpeed(); }
+function fasterPulse() { typeSpeed=Math.max(140,typeSpeed-30); updateSpeed(); }
+function updateSpeed() {
+  document.querySelector('.status-bar').textContent=`Neural Type Studio • ${typeSpeed}ms/char (${typeSpeed/10} Reel pace)`;
+}
 
-function startNeuralType(){
-  const text=prompt('Neural Type:');
-  if(!text) return; box.innerHTML='';
-  box.appendChild(cursor); let i=0;
-  const typeIt=setInterval(()=>{
-    if(i>=text.length){clearInterval(typeIt);return;}
-    cursor.insertAdjacentText('beforebegin',text[i]);i++;
-  },160); // Reel-perfect speed
+function startPerfectType(){
+  const text=prompt('Perfect Type (optimized spacing):\n\nThis is why\nyour video died\n\nNot because\nit was bad\n\n*HESITATION*\n\nNot quality');
+  if(!text) return;
+  box.innerHTML=''; box.appendChild(cursor); let i=0;
+  const typer=setInterval(()=>{
+    if(i>=text.length){ 
+      clearInterval(typer); 
+      // Final hold for perfect Reel ending
+      return; 
+    }
+    cursor.insertAdjacentText('beforebegin',text[i]); i++;
+  },typeSpeed); // 220ms = buttery smooth + readable
 }
 </script>
 </body>
